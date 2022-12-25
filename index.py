@@ -60,10 +60,30 @@ class Laser(pygame.sprite.Sprite):
             self.kill()
 
 
+def main_game():
+    laser_group.draw(screen)
+    laser_group.update()
+
+    spaceship_group.draw(screen)
+    meteor_group.draw(screen)
+    # this method updates the position of the sprite in the space_ship group
+    spaceship_group.update()
+    meteor_group.update()
+
+
+def end_game():
+    font = game_font.render('GAME OVER BITCH!', True, (255, 255, 255))
+    end_rect = font.get_rect(center=(640, 360))
+    screen.blit(font, end_rect)
+
+
 pygame.init()  # initiate pygame
 # create a display and puts it into the screen variable
 screen = pygame.display.set_mode((1280, 720))
 clock = pygame.time.Clock()  # creates an object clock
+
+# end game prompt fonts
+game_font = pygame.font.Font(None, 40)
 
 
 # objects
@@ -87,6 +107,8 @@ pygame.time.set_timer(METEOR_EVENT, 100)
 
 while True:
     for event in pygame.event.get():  # check for the events in the game/ player inputs
+
+        # main game stage
 
         # this is a event check for a game loop
         if event.type == pygame.QUIT:  # close the game
@@ -119,13 +141,11 @@ while True:
     screen.fill((118, 54, 118))
     # this is what is drwaing the sprint on the screen
 
-    laser_group.draw(screen)
-    laser_group.update()
+    if spaceship_group.sprite.health > 0:
+        main_game()
 
-    spaceship_group.draw(screen)
-    meteor_group.draw(screen)
-    # this method updates the position of the sprite in the space_ship group
-    spaceship_group.update()
-    meteor_group.update()
+    else:
+        end_game()
+
     pygame.display.update()  # Draw frame
     clock.tick(120)  # control the frame rate
