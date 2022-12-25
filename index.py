@@ -63,7 +63,6 @@ class Laser(pygame.sprite.Sprite):
 def main_game():
     laser_group.draw(screen)
     laser_group.update()
-
     spaceship_group.draw(screen)
     meteor_group.draw(screen)
     # this method updates the position of the sprite in the space_ship group
@@ -72,9 +71,15 @@ def main_game():
 
 
 def end_game():
-    font = game_font.render('GAME OVER BITCH!', True, (255, 255, 255))
+    font = game_font.render('GAME OVER!', True, (255, 255, 255))
     end_rect = font.get_rect(center=(640, 360))
     screen.blit(font, end_rect)
+
+    # score information
+    score_surface = game_font.render(
+        "Your High score is {}".format(score), True, (255, 255, 255))
+    score_rect = font.get_rect(center=(640, 400))
+    screen.blit(score_surface, score_rect)
 
 
 pygame.init()  # initiate pygame
@@ -85,6 +90,9 @@ clock = pygame.time.Clock()  # creates an object clock
 # end game prompt fonts
 game_font = pygame.font.Font(None, 40)
 
+# keeping track of the score
+global score
+score = 0
 
 # objects
 
@@ -115,6 +123,11 @@ while True:
             pygame.quit()
             sys.exit()
 
+        if event.type == pygame.MOUSEBUTTONDOWN and spaceship_group.sprite.health <= 0:
+            spaceship_group.sprite.health = 5
+            meteor_group.empty()
+            score = 0
+
         if event.type == METEOR_EVENT:
             meteor_path = random.choice(('M1.png', 'M2.png', 'M3.png'))
             meteor_x_pos = random.randrange(0, 1280)
@@ -134,6 +147,7 @@ while True:
         if pygame.sprite.spritecollide(spaceship_group.sprite, meteor_group, True):
             spaceship_group.sprite.getDamage(1)
 
+        # between the laser and the meteor
         for i in laser_group:
             if pygame.sprite.spritecollide(laser, meteor_group, True):
                 spaceship_group.sprite.getDamage(1)
@@ -143,6 +157,7 @@ while True:
 
     if spaceship_group.sprite.health > 0:
         main_game()
+        score += 1
 
     else:
         end_game()
